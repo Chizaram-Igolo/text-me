@@ -1,6 +1,7 @@
-import { gql } from "@apollo/client";
+"use client";
 
-import client from "@/apollo";
+import { gql } from "@apollo/client";
+import client from "../utils/apolloClient";
 
 const GET_DATA = gql`
   query {
@@ -8,7 +9,7 @@ const GET_DATA = gql`
   }
 `;
 
-export default async function Home() {
+export default async function FirstPage() {
   const resp = await client.query({ query: GET_DATA });
 
   console.log(resp);
