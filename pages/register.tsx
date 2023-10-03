@@ -7,12 +7,32 @@ import client from "../utils/apolloClient";
 
 // import { Formik } from "formik";
 
-import { RegisterValues, SetSubmitting } from "../utils/types";
+import {
+  RegisterValues,
+  SetSubmitting,
+  regValidationSchema,
+} from "../utils/types";
+import { Formik } from "formik";
+import Link from "next/link";
 
 const REGISTER_USER = gql`
-  mutation Register($username: String!, $email: String!, $password: String!) {
-    register(username: $username, email: $email, password: $password) {
+  mutation Register(
+    $firstname: String!
+    $lastname: String!
+    $username: String!
+    $email: String!
+    $password: String!
+  ) {
+    register(
+      firstname: $firstname
+      lastname: $lastname
+      username: $username
+      email: $email
+      password: $password
+    ) {
       id
+      firstname
+      lastname
       username
       email
     }
@@ -22,60 +42,31 @@ const REGISTER_USER = gql`
 const emptyValues = {
   firstname: "",
   lastname: "",
+  username: "",
   email: "",
   password: "",
   confirmPassword: "",
 };
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
-
   const [registerUser] = useMutation(REGISTER_USER);
 
   const initialValues = { ...emptyValues };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const { data } = await registerUser({
-        variables: formData,
-      });
-      console.log(data);
-      // Redirect to login page or perform other actions
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   async function onSubmit(
     values: RegisterValues,
     { setSubmitting }: { setSubmitting: SetSubmitting }
   ) {
-    const {
-      firstname: firstname,
-      lastname: lastname,
-      username: username,
-      email,
-      password,
-    } = values;
-    const role = "User";
+    const { confirmPassword, ...formData } = values;
 
-    registerUser({
-      variables: { firstname, lastname, username, email, password },
-    })
-      .then(() => {})
-      .catch((err) => {
-        console.log(err);
+    try {
+      const { data } = await registerUser({
+        variables: formData,
       });
+      console.log(data);
+    } catch (error) {
+      console.log("adfadf", error);
+    }
 
     setSubmitting(false);
     // navigate("/register-success", { state: { first_name, last_name, email } });
@@ -84,7 +75,7 @@ const Register = () => {
   return (
     <ApolloProvider client={client}>
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <br />
+        {/* <br />
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -114,9 +105,9 @@ const Register = () => {
           <br />
           <br />
           <button type="submit">Register</button>
-        </form>
+        </form> */}
 
-        {/* <div className="bg-white p-8 rounded shadow-md max-w-md w-full">
+        <div className="bg-white p-8 rounded shadow-md max-w-md w-full">
           <Formik
             initialValues={initialValues}
             validationSchema={regValidationSchema}
@@ -277,7 +268,7 @@ const Register = () => {
               Login here
             </Link>
           </div>
-        </div> */}
+        </div>
       </div>
     </ApolloProvider>
   );

@@ -115,8 +115,9 @@ export type DocumentType = {
 };
 
 export const regValidationSchema = object({
-  firstName: string().required().min(3).max(24).label("First name"),
-  lastName: string().required().min(3).max(24).label("Last name"),
+  firstname: string().required().min(3).max(24).label("First name"),
+  lastname: string().required().min(3).max(24).label("Last name"),
+  username: string().required().min(3).max(24).label("Username"),
   email: string().email().required().label("Email"),
   password: string().required().min(8).max(24).label("Password"),
   confirmPassword: string()
