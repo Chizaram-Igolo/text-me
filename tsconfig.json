@@ -13,7 +13,14 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "baseUrl": ".",
     "paths": {
+      "@/user/*": ["pages/user/*"],
+      "@/styles/*": ["styles/*"],
+      "@/pages/*": ["pages/*"],
+      "@/components/*": ["components/*"],
+      "@/graphql": ["graphql/*"],
+      "@/utils": ["utils/*"],
       "@/*": ["./*"]
     }
   },

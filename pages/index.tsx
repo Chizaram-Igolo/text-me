@@ -1,7 +1,7 @@
 "use client";
 
 import { gql } from "@apollo/client";
-import client from "../utils/apolloClient";
+import client from "@/graphql/apolloClient";
 
 const GET_DATA = gql`
   query {

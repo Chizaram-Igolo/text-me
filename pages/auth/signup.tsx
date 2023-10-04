@@ -1,43 +1,20 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
-import { ApolloProvider, useMutation } from "@apollo/client";
-import { gql } from "@apollo/client";
-import client from "../utils/apolloClient";
+import { Formik } from "formik";
+import { ApolloError, ApolloProvider, useMutation } from "@apollo/client";
 
-// import { Formik } from "formik";
+import client from "@/graphql/apolloClient";
+import { REGISTER_USER } from "@/graphql/queries";
 
 import {
   RegisterValues,
   SetSubmitting,
   regValidationSchema,
-} from "../utils/types";
-import { Formik } from "formik";
-import Link from "next/link";
-
-const REGISTER_USER = gql`
-  mutation Register(
-    $firstname: String!
-    $lastname: String!
-    $username: String!
-    $email: String!
-    $password: String!
-  ) {
-    register(
-      firstname: $firstname
-      lastname: $lastname
-      username: $username
-      email: $email
-      password: $password
-    ) {
-      id
-      firstname
-      lastname
-      username
-      email
-    }
-  }
-`;
+} from "@/utils/types";
+import AlertMessage from "@/components/AlertMessage";
 
 const emptyValues = {
   firstname: "",
@@ -50,6 +27,9 @@ const emptyValues = {
 
 const Register = () => {
   const [registerUser] = useMutation(REGISTER_USER);
+  const router = useRouter();
+
+  const [errorMessage, setErrorMessage] = useState("");
 
   const initialValues = { ...emptyValues };
 
@@ -58,55 +38,34 @@ const Register = () => {
     { setSubmitting }: { setSubmitting: SetSubmitting }
   ) {
     const { confirmPassword, ...formData } = values;
+    const { firstname, lastname, username, email } = formData;
 
     try {
       const { data } = await registerUser({
         variables: formData,
       });
       console.log(data);
+      router.push(
+        `/auth/signup-success?firstname=${firstname}&lastname=${lastname}&username=${username}&email=${email}`
+      );
     } catch (error) {
-      console.log("adfadf", error);
+      if (error instanceof ApolloError) {
+        if (error.message.includes("duplicate"))
+          setErrorMessage(`An account with that email address already exists.`);
+        else setErrorMessage(error.message);
+      } else {
+        setErrorMessage(
+          `An error occured while attempting to sign up: ${error}`
+        );
+      }
     }
 
     setSubmitting(false);
-    // navigate("/register-success", { state: { first_name, last_name, email } });
   }
 
   return (
     <ApolloProvider client={client}>
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        {/* <br />
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={handleInputChange}
-          />
-          <br />
-          <br />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleInputChange}
-          />
-          <br />
-          <br />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleInputChange}
-          />
-          <br />
-          <br />
-          <button type="submit">Register</button>
-        </form> */}
-
         <div className="bg-white p-8 rounded shadow-md max-w-md w-full">
           <Formik
             initialValues={initialValues}
@@ -126,6 +85,9 @@ const Register = () => {
             }) => (
               <form onSubmit={handleSubmit}>
                 <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
+                {errorMessage && (
+                  <AlertMessage type="error" message={errorMessage} />
+                )}
                 <div className="mb-4">
                   <label htmlFor="firstname" className="block font-medium mb-1">
                     First Name
@@ -264,7 +226,7 @@ const Register = () => {
 
           <div className="mt-5">
             Already have an account?{" "}
-            <Link href="/login" className="text-blue-800">
+            <Link href="/auth/signin" className="text-blue-800">
               Login here
             </Link>
           </div>
