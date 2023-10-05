@@ -49,6 +49,18 @@ export const GET_BOOKS = gql`
   }
 `;
 
+export const GET_BOOK = gql`
+  query getBook($id: ID!) {
+    book(id: $id) {
+      _id
+      title
+      author
+      description
+      publishedDate
+    }
+  }
+`;
+
 export const ADD_BOOK = gql`
   mutation (
     $title: String!

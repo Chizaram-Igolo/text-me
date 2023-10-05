@@ -8,17 +8,18 @@ import useAuth from "@/components/hooks/useAuth";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
-  const isAuthenticated = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
     if (
       !isAuthenticated &&
-      router.pathname !== "/auth/signup" &&
-      router.pathname !== "/auth/signin"
+      !loading &&
+      router.pathname !== "/auth/signin" &&
+      router.pathname !== "/auth/signup"
     ) {
       router.push("/auth/signin");
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, loading]);
 
   return (
     <ApolloProvider client={client}>

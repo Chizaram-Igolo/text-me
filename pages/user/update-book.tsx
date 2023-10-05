@@ -1,16 +1,19 @@
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import { UPDATE_BOOK, GET_BOOKS } from "@/graphql/queries";
 
 const UpdateBook = () => {
-  const [formData, setFormData] = useState({
-    title: "",
-    author: "",
-    description: "",
-    publishedDate: "",
-  });
+  const router = useRouter();
 
-  const { loading, error, data } = useQuery(GET_BOOKS);
+  const { id, title, author, description, publishedDate } = router.query;
+
+  const [formData, setFormData] = useState({
+    title: title,
+    author: author,
+    description: description,
+    publishedDate: publishedDate,
+  });
 
   const [updateBook] = useMutation(UPDATE_BOOK, {
     refetchQueries: [{ query: GET_BOOKS }],
@@ -27,7 +30,7 @@ const UpdateBook = () => {
     try {
       const response = await updateBook({
         variables: {
-          id: "your-book-id", // Replace with the ID of the book to update
+          id: id,
           ...formData,
         },
       });
@@ -37,28 +40,10 @@ const UpdateBook = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-
   return (
     <div>
       <h1>Update Book</h1>
       <form onSubmit={handleUpdateBook}>
-        <select
-          name="id"
-          onChange={handleInputChange}
-          value={formData.id}
-          required
-        >
-          <option value="" disabled>
-            Select a Book
-          </option>
-          {data.books.map((book: Book) => (
-            <option key={book._id} value={book._id}>
-              {book.title} by {book.author}
-            </option>
-          ))}
-        </select>
         <input
           type="text"
           name="title"
