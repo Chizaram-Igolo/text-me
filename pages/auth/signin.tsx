@@ -16,8 +16,14 @@ import { SIGNIN_USER } from "@/graphql/queries";
 const emptyValues = { email: "", password: "" };
 
 export default function SignIn() {
-  const [signinUser] = useMutation(SIGNIN_USER);
   const router = useRouter();
+
+  const [signinUser] = useMutation(SIGNIN_USER, {
+    onCompleted: (data) => {
+      localStorage.setItem("token", data.login.token);
+      router.push("/user/dashboard");
+    },
+  });
 
   const [errorMessage, setErrorMessage] = useState("");
   const initialValues = { ...emptyValues };
@@ -28,10 +34,7 @@ export default function SignIn() {
   ) {
     try {
       const { data } = await signinUser({ variables: values });
-
       console.log(data);
-
-      router.push("/user/dashboard");
     } catch (error) {
       if (error instanceof ApolloError) {
         setErrorMessage(error.message);

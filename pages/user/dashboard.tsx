@@ -1,4 +1,5 @@
-import { useQuery, useMutation } from "@apollo/client";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import {
   GET_BOOKS,
   ADD_BOOK,
@@ -7,6 +8,7 @@ import {
 } from "@/graphql/queries";
 import BookList from "@/components/BookList";
 import Link from "next/link";
+import useAuth from "@/components/hooks/useAuth";
 
 const Dashboard = () => {
   // Define your state and functions for managing book data here
